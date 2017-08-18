@@ -12,6 +12,10 @@ var http = require('http');
 
 var app = express();
 
+var cors = require('cors');
+app.options('*', cors());
+
+ 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -27,13 +31,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 
+var connection = require('./modules/connection.js');
+ 
+ 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
-const port = 3000; 
+
+ 
+// const port = 8081; 
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -45,28 +54,12 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-try
-{
-  const requestHandler = (request, response) => {  
-  console.log(request.url)
-  console.log('papa');
-  response.end('Hello Node.js Server!')
-  console.log('papa');
-}
 
-const server = http.createServer(requestHandler);
+// starting port on 5000
+var server = app.listen(5000, function() {
+    console.log(new Date().toISOString() + ": server started on port 5000");
+});
 
 
-server.listen(port, (err) => {  
-  if (err) {
-    return console.log('something bad happened', err)
-  } 
-  console.log(`server is listening on ${port}`)
-})
-
-}catch(e)
-{
-	console.log(e);
-}
 
 module.exports = app;
