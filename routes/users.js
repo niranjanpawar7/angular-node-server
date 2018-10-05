@@ -25,7 +25,16 @@ router.post('/savedata', function(req, res, next) {
 });
 
 router.post('/userData', function(req, res, next) {
-		var token = req.body.token;
+
+
+		console.log('=================', req.headers.authorization);
+		var token = req.headers.authorization;
+		token = token.split('_');
+		console.log('++++++++++++++++++++++++', token);
+		token = token[1];
+		console.log('=================', token);
+
+
 
 		var checkToken = "select * from token_table WHERE token = '"+ token +"'";
 
@@ -64,8 +73,7 @@ router.post('/login', function(req, res, next) {
 			res.send(err);
 		}else{
 
-		console.log('===================== ', result);
-		console.log('===================== ', result[0]);
+
 		if(result && result[0]){
 			// anuja code
 			require('crypto').randomBytes(48, function(err, buffer){
