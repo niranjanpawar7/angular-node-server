@@ -1,4 +1,4 @@
-var express = require('express');
+ var express = require('express');
 var db = require('../db/database')
 var router = express.Router();
 var crypto = require('crypto');
@@ -6,13 +6,17 @@ var crypto = require('crypto');
 /* GET users listing. */
 router.post('/savedata', function(req, res, next) {
 
-	var name = req.body.name;
+	var username = req.body.username;
 	var contact = req.body.contact;
 	var email = req.body.email;
 	var pass = req.body.password;
+	var confirmpass = req.body.password;
 
-  	var sql = "INSERT INTO user_registraion (username, email, contact, password) VALUES ("+"'"+ name + "','"+ email+"','"+ contact+ "','" + pass+"')";
+  	var sql = "INSERT INTO user_registraion (username, email, contact, password, confpassword) VALUES ("+"'"+ username + "','"+ email+"','"+ contact+ "' ,'"+ pass+ "','" + confirmpass+"')";
 
+  	console.log('====================');
+  	console.log(sql);
+  	console.log('====================');
 
 	db.query(sql, function(err, result) {
 		if(err){
@@ -61,10 +65,11 @@ router.post('/userData', function(req, res, next) {
 
 router.post('/login', function(req, res, next) {
 
-	var email = req.body.email;
+	var username = req.body.username;
 	var pass = req.body.password;
 
-  	var loginSql = "select * from user_registraion WHERE email = '"+ email +"' and password = '" + pass+ "'";
+	console.log(req.body)
+  	var loginSql = "select * FROM user_registraion WHERE username = '"+ username +"' AND  password = '" + pass+ "'";
 
   	console.log(loginSql);
 
@@ -73,7 +78,10 @@ router.post('/login', function(req, res, next) {
 			res.send(err);
 		}else{
 
-
+		console.log('==============================');		
+		console.log(result);
+		console.log('==============================');
+				
 		if(result && result[0]){
 			// anuja code
 			require('crypto').randomBytes(48, function(err, buffer){
