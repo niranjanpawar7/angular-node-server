@@ -1,10 +1,10 @@
- var express = require('express');
+var express = require('express');
 var db = require('../db/database')
 var router = express.Router();
 var crypto = require('crypto');
 
-/* GET users listing. */
-router.post('/savedata', function(req, res, next) {
+
+router.post('/savedata', function (req, res, next) {
 
 	var username = req.body.username;
 	var contact = req.body.contact;
@@ -12,103 +12,119 @@ router.post('/savedata', function(req, res, next) {
 	var pass = req.body.password;
 	var confirmpass = req.body.password;
 
-  	var sql = "INSERT INTO user_registraion (username, email, contact, password, confpassword) VALUES ("+"'"+ username + "','"+ email+"','"+ contact+ "' ,'"+ pass+ "','" + confirmpass+"')";
+	var sql = "INSERT INTO user_registraion (username, email, contact, password, confpassword) VALUES (" + "'" + username + "','" + email + "','" + contact + "' ,'" + pass + "','" + confirmpass + "')";
 
-  	console.log('====================');
-  	console.log(sql);
-  	console.log('====================');
+	console.log('====================');
+	console.log(sql);
+	console.log('====================');
 
-	db.query(sql, function(err, result) {
-		if(err){
+	db.query(sql, function (err, result) {
+		if (err) {
 			res.send(err);
-		}else{
+		} else {
 			res.send(result);
 		}
 	});
 
 });
 
-router.post('/userData', function(req, res, next) {
+/* GET users listing. */
+router.post('/getUserData', function (req, res, next) {  
+	console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+	var sql = "SELECT * FROM user_registraion"; 
 
-
-		console.log('=================', req.headers.authorization);
-		var token = req.headers.authorization;
-		token = token.split('_');
-		console.log('++++++++++++++++++++++++', token);
-		token = token[1];
-		console.log('=================', token);
-
-
-
-		var checkToken = "select * from token_table WHERE token = '"+ token +"'";
-
-		db.query(checkToken, function(err, result) {
-		if(err){
+	db.query(sql, function (err, result) {
+		if (err) {
 			res.send(err);
-		}else{
+		} else {
+			console.log('========== PAPA ==========');
+			res.send(result);
+		}
+	});
+
+});
+
+router.post('/userData', function (req, res, next) {
+
+
+	console.log('=================', req.headers.authorization);
+	var token = req.headers.authorization;
+	token = token.split('_');
+	console.log('++++++++++++++++++++++++', token);
+	token = token[1];
+	console.log('=================', token);
+
+
+
+	var checkToken = "select * from token_table WHERE token = '" + token + "'";
+
+	db.query(checkToken, function (err, result) {
+		if (err) {
+			res.send(err);
+		} else {
 			//res.send(result);
-		var userData = "select * from user_registraion WHERE id = '"+ result[0].user_id +"'";
+			var userData = "select * from user_registraion WHERE id = '" + result[0].user_id + "'";
 
-		db.query(userData	, function(err, result1) {
-			if(err){
-				res.send(err);
-			}else{
-				res.send(result1);
-			}
-		})
+			db.query(userData, function (err, result1) {
+				if (err) {
+					res.send(err);
+				} else {
+					res.send(result1);
+				}
+			})
 
-	}
+		}
 
- })
+	})
 
-})
+});
 
-router.post('/login', function(req, res, next) {
+router.post('/login', function (req, res, next) {
 
 	var username = req.body.username;
 	var pass = req.body.password;
 
 	console.log(req.body)
-  	var loginSql = "select * FROM user_registraion WHERE username = '"+ username +"' AND  password = '" + pass+ "'";
+	var loginSql = "select * FROM user_registraion WHERE username = '" + username + "' AND  password = '" + pass + "'";
 
-  	console.log(loginSql);
+	console.log(loginSql);
 
-	db.query(loginSql, function(err, result) {
-		if(err){
+	db.query(loginSql, function (err, result) {
+		if (err) {
 			res.send(err);
-		}else{
+		} else {
 
-		console.log('==============================');		
-		console.log(result);
-		console.log('==============================');
-				
-		if(result && result[0]){
-			// anuja code
-			require('crypto').randomBytes(48, function(err, buffer){
+			console.log('==============================');
+			console.log(result);
+			console.log('==============================');
 
-				var token = buffer.toString('hex');
-				var userId = result[0].id;
-				var tokenSql = "INSERT INTO token_table (token, user_id) VALUES ("+"'"+ token + "', '" + userId +"')";
+			if (result && result[0]) {
+				// anuja code
+				require('crypto').randomBytes(48, function (err, buffer) {
+
+					var token = buffer.toString('hex');
+					var userId = result[0].id;
+					var tokenSql = "INSERT INTO token_table (token, user_id) VALUES (" + "'" + token + "', '" + userId + "')";
 
 
-				db.query(tokenSql, function(err, resultdata) {
-					if(err){
-						res.send(err);
-					}else{
-						//res.send(token);
-						res.json({
-							token:token,
-							data:result
-			 			});
-					}
+					db.query(tokenSql, function (err, resultdata) {
+						if (err) {
+							res.send(err);
+						} else {
+							//res.send(token);
+							res.json({
+								token: token,
+								data: result
+							});
+						}
+					});
+				})
+			} else {
+				res.json({
+					token: null,
+					data: null
 				});
-			})
-		}else{
-			res.json({
-						token:null,
-						data:null
-			 		});
-		}
+			}
 
 		}
 	});
