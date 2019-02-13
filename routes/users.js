@@ -4,6 +4,7 @@ var router = express.Router();
 var crypto = require('crypto');
 
 
+// Save user
 router.post('/savedata', function (req, res, next) {
 
 	var username = req.body.username;
@@ -12,13 +13,40 @@ router.post('/savedata', function (req, res, next) {
 	var pass = req.body.password;
 	var confirmpass = req.body.password;
 
-	var sql = "INSERT INTO user_registraion (username, email, contact, password, confpassword) VALUES (" + "'" + username + "','" + email + "','" + contact + "' ,'" + pass + "','" + confirmpass + "')";
-
-	console.log('====================');
-	console.log(sql);
-	console.log('====================');
+	var sql = "INSERT INTO user_registraion (username, email, contact, password, confpassword) VALUES (" + "'" + username + "','" + email + "','" + contact + "' ,'" + pass + "','" + confirmpass + "')";  
 
 	db.query(sql, function (err, result) {
+		if (err) {
+			res.send(err);
+		} else {
+			res.send(result);
+		}
+	});
+
+});
+
+
+// Update User
+router.post('/updateUser', function (req, res, next) {
+
+	var id = req.body.id;
+	var username = req.body.username;
+	var contact = req.body.contact;
+	var email = req.body.email;
+	var pass = req.body.password;
+	var confirmpass = req.body.password;
+
+
+	 
+	var sql = "INSERT INTO user_registraion (username, email, contact, password, confpassword) VALUES (" + "'" + username + "','" + email + "','" + contact + "' ,'" + pass + "','" + confirmpass + "')";
+
+	var mswl = "UPDATE user_registraion SET username = '" + username + "',  email = '" + email + "', contact = '" + contact + "', password = '" + pass + "', confpassword = '" + confirmpass + "'  WHERE id = '"+ id +"'";
+	
+	console.log('++++++++++++++++++++++++++++++++++++');
+	console.log(mswl); 
+	console.log('+++++++++++++++++++++++++++++++++++++++++++');
+
+	db.query(mswl, function (err, result) {
 		if (err) {
 			res.send(err);
 		} else {
@@ -30,30 +58,28 @@ router.post('/savedata', function (req, res, next) {
 
 /* GET users listing. */
 router.post('/getUserData', function (req, res, next) {  
-	console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+	 
 	var sql = "SELECT * FROM user_registraion"; 
 
 	db.query(sql, function (err, result) {
 		if (err) {
 			res.send(err);
-		} else {
-			console.log('========== PAPA ==========');
+		} else { 
 			res.send(result);
 		}
 	});
 
 });
 
+
+//Token
 router.post('/userData', function (req, res, next) {
 
 
-	console.log('=================', req.headers.authorization);
+	
 	var token = req.headers.authorization;
-	token = token.split('_');
-	console.log('++++++++++++++++++++++++', token);
-	token = token[1];
-	console.log('=================', token);
-
+	token = token.split('_'); 
+	token = token[1]; 
 
 
 	var checkToken = "select * from token_table WHERE token = '" + token + "'";
@@ -79,7 +105,8 @@ router.post('/userData', function (req, res, next) {
 
 });
 
-router.post('/login', function (req, res, next) {
+// Login
+router.post('/login', function (req, res, next) {	
 
 	var username = req.body.username;
 	var pass = req.body.password;
